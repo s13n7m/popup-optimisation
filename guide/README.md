@@ -26,7 +26,7 @@ Without Supabase the guide saves ticks in the browser only. To sync across brows
 
 1. Create a Supabase project and run `supabase/progress.sql` (ticks) and then `supabase/work_sessions.sql` (work timer) in the SQL editor.
 2. Copy `.env.example` to `.env` and fill in the project URL and the anon key. Use the anon key only.
-3. In Authentication, add your Vercel URLs as redirect URLs, sign in once with an email link, then turn off new sign-ups.
+3. In Authentication, add your Vercel URLs as redirect URLs. Under Email Templates, Magic Link, add `{{ .Token }}` to the body so the email carries a 6-digit code. Sign in with the code (it works across devices, unlike a link that mail apps can use up), then turn off new sign-ups.
 4. Set the same two variables in Vercel.
 
 ## Deploy

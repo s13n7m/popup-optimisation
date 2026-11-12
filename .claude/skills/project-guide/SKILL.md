@@ -59,7 +59,8 @@ The guide works without Supabase, saving in the browser only. To sync, the user 
 1. Create a Supabase project and run `supabase/progress.sql`, then `supabase/work_sessions.sql`, in the SQL editor.
 2. Authentication: keep Email on. Add the production URL and the preview URL pattern as redirect URLs.
 3. Put `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in a local `.env` and in the Vercel project's environment variables, then redeploy. Use only the anon key. Never put a service-role key in a browser app.
-4. Sign in once with an email link, then turn off new sign-ups so only that account exists.
+4. Email Templates, Magic Link: add `{{ .Token }}` to the body so the email carries a one-time code. The guide signs in with that code, which works across devices. A link alone can be used up by mail apps that pre-open links.
+5. Sign in once with the code, then turn off new sign-ups so only that account exists.
 
 Row level security limits every row to its owner. Do not weaken the policies.
 

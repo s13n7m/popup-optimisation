@@ -72,7 +72,6 @@ input[type='checkbox']:checked::after { content: ''; width: 5px; height: 10px; b
 .tags { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin: 0; }
 .empty { padding: 8px; }
 .files { margin: 0 12px 12px; background: #fff3bf; border: 1.5px solid #e67700; padding: 8px 10px; font-family: 'Courier New', ui-monospace, monospace; font-size: 0.78rem; display: flex; flex-direction: column; gap: 2px; }
-.files.inline { margin: 0; flex-direction: row; flex-wrap: wrap; gap: 4px 12px; }
 
 /* Phones and small tablets: stages stack top to bottom, each stage's cards scroll sideways */
 @media (max-width: 767px) {
@@ -85,20 +84,7 @@ input[type='checkbox']:checked::after { content: ''; width: 5px; height: 10px; b
   .empty { flex: 0 0 100%; }
 }
 
-.sheet-wrap { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.35); display: flex; justify-content: flex-end; z-index: 10; }
-.sheet { background: #fff; width: min(480px, 100%); height: 100%; overflow: auto; padding: 18px 20px 28px; border-left: 2px solid var(--ink); font-family: var(--sans); font-size: 0.98rem; line-height: 1.5; }
-.sheet h2 { font-size: 1.7rem; line-height: 1.05; margin: 10px 0 8px; }
-.sheet h3 { font-size: 1.35rem; margin: 16px 0 4px; }
-.sheet-top { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; }
-.sheet-top p { margin: 0; font-size: 0.85rem; }
-.sheet ol { padding-left: 20px; margin: 0; }
-.sheet li { margin-bottom: 6px; }
-.mark { display: flex; gap: 8px; align-items: center; margin-top: 18px; font-weight: 600; }
 
-@media (max-width: 767px) {
-  .sheet-wrap { align-items: flex-end; }
-  .sheet { height: auto; max-height: 88vh; border-left: 0; border-top: 2px solid var(--ink); }
-}
 
 .view { max-width: 980px; }
 .view-title { font-size: 2.2rem; margin-bottom: 4px; }
@@ -125,3 +111,32 @@ pre { margin: 0; padding: 12px; background: #1e1e1e; color: #f1f3f5; overflow-x:
 .phase-body p { margin: 2px 0 0; }
 
 @media (prefers-reduced-motion: reduce) { .bar > div { transition: none; } }
+
+/* Collapsible cards */
+.card-main { width: 100%; }
+.card.open { border-left-color: var(--ink); }
+.chev { margin-left: auto; width: 20px; height: 20px; border: 1.5px solid var(--ink); display: inline-grid; place-content: center; font-weight: 700; line-height: 1; background: #fff; }
+.detail { grid-column: 2; font-family: var(--sans); font-size: 0.9rem; line-height: 1.45; border-top: 1.5px dashed var(--line); padding-top: 6px; }
+.detail h4 { font-family: var(--display); font-size: 1.15rem; margin: 6px 0 2px; }
+.detail ol { margin: 0; padding-left: 18px; }
+.detail li { margin-bottom: 4px; }
+.detail p { margin: 0; }
+.head-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.head-actions .btn:disabled { opacity: 0.5; cursor: default; }
+.spacer { flex: 1; }
+
+/* Work timer: a box beside the title on large screens, a floating clock top right on phones */
+.title-row { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+.timer { display: inline-grid; grid-template-columns: auto auto; align-items: center; gap: 2px 12px; padding: 6px 10px; border: 2px solid var(--ink); background: #fff; box-shadow: 4px 4px 0 var(--ink); }
+.timer.on { background: #ebfbee; border-color: #2b8a3e; box-shadow: 4px 4px 0 #2b8a3e; }
+.clock { font-family: 'Courier New', ui-monospace, monospace; font-weight: 700; font-size: 1.8rem; letter-spacing: 0.04em; font-variant-numeric: tabular-nums; }
+.timer-extra { grid-column: 1 / -1; margin: 0; font-size: 0.8rem; color: var(--muted); }
+.timer-btn { min-width: 74px; }
+@media (max-width: 767px) {
+  .timer { position: fixed; top: 8px; right: 8px; z-index: 20; padding: 4px 8px; gap: 8px; box-shadow: 3px 3px 0 var(--ink); }
+  .timer.on { box-shadow: 3px 3px 0 #2b8a3e; }
+  .clock { font-size: 1.2rem; }
+  .timer-btn { min-width: 0; padding: 3px 8px; font-size: 0.9rem; }
+  .timer-extra { display: none; }
+  .title-row h1 { max-width: calc(100% - 190px); }
+}

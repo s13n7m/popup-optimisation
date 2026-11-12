@@ -9,7 +9,7 @@ export function AuthBar({ session, sync }: { session: Session | null; sync: Sync
   const sb = supabase;
 
   if (!sb) {
-    return <p className="auth muted">Ticks save in this browser only. Add the Supabase keys to sync them across devices.</p>;
+    return <p className="auth muted">Everything saves in this browser only. Add the Supabase keys to sync them across devices.</p>;
   }
   if (session) {
     const label = sync === 'saving' ? 'Saving...' : sync === 'error' ? 'Could not save, try again' : 'Synced';

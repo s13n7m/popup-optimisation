@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import { CADENCE, PHASE, type Card, type Stage } from '../types';
 
 export interface Filters {
@@ -32,7 +33,7 @@ export function Board({ stages, done, filters, onToggle, onOpen, onNavigate }: P
         const count = s.cards.filter((c) => done[c.id]).length;
         const shown = s.cards.filter((c) => visible(c, filters, done));
         return (
-          <section key={s.id} className="stage" aria-labelledby={`h-${s.id}`}>
+          <section key={s.id} className="stage" aria-labelledby={`h-${s.id}`} style={{ '--tint': ph.tint, '--head': ph.head } as CSSProperties}>
             <header className="stage-head" style={{ background: ph.head }}>
               <div className="eyebrow">
                 <span>{s.eyebrow}</span>
@@ -57,7 +58,7 @@ export function Board({ stages, done, filters, onToggle, onOpen, onNavigate }: P
             <ul className="cards">
               {shown.length === 0 && <li className="empty muted">No cards match the filters.</li>}
               {shown.map((c) => (
-                <li key={c.id} className={`card${done[c.id] ? ' done' : ''}${c.extra ? ' extra' : ''}`} style={{ background: done[c.id] ? undefined : ph.tint }}>
+                <li key={c.id} className={`card${done[c.id] ? ' done' : ''}${c.extra ? ' extra' : ''}`}>
                   <input
                     type="checkbox"
                     id={`t-${c.id}`}

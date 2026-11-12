@@ -140,3 +140,7 @@ pre { margin: 0; padding: 12px; background: #1e1e1e; color: #f1f3f5; overflow-x:
   .timer-extra { display: none; }
   .title-row h1 { max-width: calc(100% - 190px); }
 }
+
+/* Collapsed stage: only the header box remains */
+.stage-body { min-width: 0; }
+.stage.collapsed .stage-head { border-bottom: 0; }

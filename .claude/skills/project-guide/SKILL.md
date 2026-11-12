@@ -15,7 +15,8 @@ The reference implementation is `guide/` in this repo. `template/` beside this f
 - **Cards:** a short action, a run-frequency marker, optional tags, a tick box and a collapsible body with numbered steps and a "done when" check.
 - **Timer:** a work clock that counts up, pauses on Pause or when the tab is hidden, and saves sessions.
 - **Tabs:** Stages, a reference tab (API or source how-tos with copyable examples), and Build order (phases with finish lines).
-- **Filters:** run frequency, the cross-cutting thread tag, extras only, hide done. Expand all and collapse all.
+- **Filters:** run frequency, the cross-cutting thread tag, extras only, hide done.
+- **Collapsing:** each stage collapses into its header box (button per stage, plus Expand all stages and Collapse all stages), remembered on the device. Each card expands in place with its own + button, independent of the stage.
 - **Layout rules:** square corners everywhere, hard-shadow stage panels. Desktop is side-by-side columns scrolling sideways. Under 768px the stages stack top to bottom and each stage's cards scroll sideways. The timer is a box beside the title on large screens and a floating clock top right on phones.
 
 ## Process

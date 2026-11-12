@@ -26,6 +26,13 @@ export function App() {
   const timer = useTimer(session);
   const [view, setView] = useState(fromHash);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>(() => {
+    try {
+      return JSON.parse(localStorage.getItem(`${GUIDE.storageKey}-collapsed-v1`) || '{}');
+    } catch {
+      return {};
+    }
+  });
   const [filters, setFilters] = useState<Filters>({ cadence: [], uiOnly: false, extrasOnly: false, hideDone: false });
 
   useEffect(() => {
@@ -47,11 +54,15 @@ export function App() {
   const total = allCards.length;
   const count = useMemo(() => allCards.filter((c) => done[c.id]).length, [done]);
   const toggleExpand = useCallback((id: string) => setExpanded((e) => ({ ...e, [id]: !e[id] })), []);
-  const expandMany = useCallback((ids: string[], open: boolean) => setExpanded((e) => {
-    const next = { ...e };
-    ids.forEach((id) => { next[id] = open; });
-    return next;
-  }), []);
+  const setStages = useCallback((next: Record<string, boolean>) => {
+    setCollapsed(next);
+    try {
+      localStorage.setItem(`${GUIDE.storageKey}-collapsed-v1`, JSON.stringify(next));
+    } catch {
+      /* storage may be unavailable */
+    }
+  }, []);
+  const toggleStage = useCallback((id: string) => setStages({ ...collapsed, [id]: !collapsed[id] }), [collapsed, setStages]);
 
   const toggleCadence = (k: string) =>
     setFilters((f) => ({ ...f, cadence: f.cadence.includes(k) ? f.cadence.filter((x) => x !== k) : [...f.cadence, k] }));
@@ -96,10 +107,10 @@ export function App() {
             <button className="chip-btn" aria-pressed={filters.extrasOnly} onClick={() => setFilters((f) => ({ ...f, extrasOnly: !f.extrasOnly }))}>Extras only</button>
             <button className="chip-btn" aria-pressed={filters.hideDone} onClick={() => setFilters((f) => ({ ...f, hideDone: !f.hideDone }))}>Hide done</button>
             <span className="spacer" />
-            <button className="btn small" onClick={() => expandMany(allCards.map((c) => c.id), true)}>Expand all</button>
-            <button className="btn small" onClick={() => setExpanded({})}>Collapse all</button>
+            <button className="btn small" onClick={() => setStages({})}>Expand all stages</button>
+            <button className="btn small" onClick={() => setStages(Object.fromEntries(stages.map((s) => [s.id, true])))}>Collapse all stages</button>
           </div>
-          <Board stages={stages} done={done} expanded={expanded} filters={filters} onToggle={toggle} onExpand={toggleExpand} onExpandMany={expandMany} onNavigate={navigate} />
+          <Board stages={stages} done={done} expanded={expanded} collapsed={collapsed} filters={filters} onToggle={toggle} onExpand={toggleExpand} onToggleStage={toggleStage} onNavigate={navigate} />
         </>
       )}
       {view === 'data-sources' && <DataSources />}

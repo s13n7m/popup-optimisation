@@ -21,23 +21,24 @@ interface Props {
   stages: Stage[];
   done: Record<string, boolean>;
   expanded: Record<string, boolean>;
+  collapsed: Record<string, boolean>;
   filters: Filters;
   onToggle: (id: string) => void;
   onExpand: (id: string) => void;
-  onExpandMany: (ids: string[], open: boolean) => void;
+  onToggleStage: (id: string) => void;
   onNavigate: (view: string) => void;
 }
 
-export function Board({ stages, done, expanded, filters, onToggle, onExpand, onExpandMany, onNavigate }: Props) {
+export function Board({ stages, done, expanded, collapsed, filters, onToggle, onExpand, onToggleStage, onNavigate }: Props) {
   return (
     <div className="board">
       {stages.map((s) => {
         const ph = PHASE[s.phase];
         const count = s.cards.filter((c) => done[c.id]).length;
         const shown = s.cards.filter((c) => visible(c, filters, done));
-        const allOpen = shown.length > 0 && shown.every((c) => expanded[c.id]);
+        const isCollapsed = !!collapsed[s.id];
         return (
-          <section key={s.id} className="stage" aria-labelledby={`h-${s.id}`} style={{ '--tint': ph.tint, '--head': ph.head } as CSSProperties}>
+          <section key={s.id} className={`stage${isCollapsed ? ' collapsed' : ''}`} aria-labelledby={`h-${s.id}`} style={{ '--tint': ph.tint, '--head': ph.head } as CSSProperties}>
             <header className="stage-head" style={{ background: ph.head }}>
               <div className="eyebrow">
                 <span>{s.eyebrow}</span>
@@ -56,14 +57,16 @@ export function Board({ stages, done, expanded, filters, onToggle, onExpand, onE
                 <div style={{ width: `${(count / s.cards.length) * 100}%` }} />
               </div>
               <div className="head-actions">
-                <button className="btn small" disabled={shown.length === 0} onClick={() => onExpandMany(shown.map((c) => c.id), !allOpen)}>
-                  {allOpen ? 'Collapse stage' : 'Expand stage'}
+                <button className="btn small" aria-expanded={!isCollapsed} aria-controls={`body-${s.id}`} onClick={() => onToggleStage(s.id)}>
+                  {isCollapsed ? 'Expand stage' : 'Collapse stage'}
                 </button>
                 {GUIDE.referenceStageId && s.id === GUIDE.referenceStageId && (
                   <button className="btn small" onClick={() => onNavigate('data-sources')}>{GUIDE.reference.tabLabel}</button>
                 )}
               </div>
             </header>
+            {!isCollapsed && (
+            <div id={`body-${s.id}`} className="stage-body">
             <ul className="cards">
               {shown.length === 0 && <li className="empty muted">No cards match the filters.</li>}
               {shown.map((c) => {
@@ -101,6 +104,8 @@ export function Board({ stages, done, expanded, filters, onToggle, onExpand, onE
             <div className="files" aria-label="Make targets and files">
               {s.files.map((f) => <div key={f}>{f}</div>)}
             </div>
+            </div>
+            )}
           </section>
         );
       })}

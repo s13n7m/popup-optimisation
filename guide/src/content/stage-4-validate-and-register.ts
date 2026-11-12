@@ -1,0 +1,31 @@
+import { card, type Stage } from '../types';
+
+export const stage4: Stage = {
+  id: 'validate-and-register', num: 4, phase: 'build', eyebrow: 'VALIDATION', step: 'step 2',
+  title: 'Validate and register', branch: 'validate-and-register', out: 'out: versioned champion model',
+  summary: 'Prove the model is good enough, then save it with enough detail to reproduce and compare it.',
+  files: ['models/xgb.json', 'metadata json'],
+  cards: [
+    card('s4-mae', 'O', 'Report MAE overall and by market',
+      ['Compute MAE on the validation weeks.', 'Print it per market so one weak market cannot hide.'],
+      'A table of MAE by market prints after make train.'),
+    card('s4-calib', 'O', 'Check calibration: predicted vs actual by decile',
+      ['Sort validation rows by prediction into ten buckets.', 'Compare the average prediction with the average actual in each.'],
+      'The deciles sit close to the diagonal.'),
+    card('s4-truth', 'O', 'Test against the hidden truth on venues that never had cars',
+      ['Because you built the simulator, you know the true rate everywhere.', 'Measure error on venues with no training rows.'],
+      'You know how biased the model is where it never saw data.', { extra: true }),
+    card('s4-save', 'O', 'Save models/xgb.json with train window, features and metrics',
+      ['Write the model and a metadata json together.', 'Include a version id and the git commit.'],
+      'Loading the model also gives you its window and metrics.'),
+    card('s4-gate', 'O', 'Gate: promote only if it beats a naive baseline and the last champion',
+      ['Compare against the per-market average.', 'Compare against the saved champion on the same weeks.', 'Refuse to overwrite the champion if either fails.'],
+      'A worse model is rejected automatically.', { extra: true }),
+    card('s4-explain-check', 'O', 'Check the explanations against the hidden truth',
+      ['For a sample of venues, compare the top drivers with the true simulator drivers.', 'Remove or reword any driver that misleads.'],
+      'Explanations agree with the truth on most sampled venues.', { ui: true }),
+    card('s4-confidence', 'O', 'Turn model error into a plain confidence label: high, medium, low',
+      ['Use error by decile or by venue history to set thresholds.', 'Give venues with little history a low label.'],
+      'Every prediction has a confidence label planners can read.', { ui: true }),
+  ],
+};

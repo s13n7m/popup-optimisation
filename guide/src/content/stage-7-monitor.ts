@@ -1,0 +1,30 @@
+import { card, type Stage } from '../types';
+
+export const stage7: Stage = {
+  id: 'monitor', num: 7, phase: 'run', eyebrow: 'MONITORING', step: 'step 7',
+  title: 'Monitor', branch: 'monitor', out: 'out: health report and trigger',
+  summary: 'Watch the pipeline, the model and the decisions, and know early when something drifts.',
+  files: ['make monitor', 'src/monitor.py'],
+  cards: [
+    card('s7-pipeline', 'N', 'Pipeline health: did the batch run, row counts, nulls, scored_at age',
+      ['Read the latest predictions file.', 'Flag a missing run, a drop in rows or an old scored_at.'], 'A skipped night is flagged the next morning.'),
+    card('s7-psi', 'N', 'Model health: PSI per feature, train vs latest, flag above 0.2',
+      ['Implement psi(expected, actual, bins=10).', 'Run it for each feature.'], 'Shifting one feature on purpose raises its PSI.'),
+    card('s7-resid', 'N', 'Residuals by market: predicted vs actual to catch concept drift',
+      ['Join predictions to the latest actuals.', 'Average the error per market per week.'], 'A market with a changed effect shows a clear residual trend.'),
+    card('s7-decision', 'N', 'Decision health: does the MIP plan still beat greedy?',
+      ['Re-run both on the latest predictions.', 'Record the gap.'], 'The gap is logged every night.'),
+    card('s7-drift', 'O', 'Bonus: inject drift after week 40 and check residuals fire before PSI',
+      ['Change the income by season effect in make_data after week 40.', 'Run monitor and compare which signal fires first.'], 'You can show residuals catch it earlier.'),
+    card('s7-alert', 'N', 'Save a report and raise an alert on any breach',
+      ['Write a json or html report each run.', 'Send a message when a threshold is crossed.'], 'A deliberate breach sends an alert.', { extra: true }),
+    card('s7-usage', 'N', 'Track planner usage: plans opened, re-plans run, screens visited',
+      ['Add simple privacy-friendly analytics to app/.', 'Review weekly.'], 'You can see whether planners use What if and Why.', { ui: true }),
+    card('s7-latency', 'N', 'Track solve time as the planner feels it',
+      ['Log end-to-end re-plan time in the app.', 'Alert if it passes your target.'], 'You know the slowest 5% of re-plans.', { ui: true }),
+    card('s7-feedback', 'N', 'Add a feedback button on every recommendation',
+      ['Add a thumbs up or down with an optional note.', 'Store it with the venue and plan id.'], 'Planner feedback lands in a table you can read.', { ui: true }),
+    card('s7-override', 'N', 'Watch the planner override rate as a decision-health signal',
+      ['Count how often planners exclude a recommended venue.', 'Investigate venues excluded again and again.'], 'You can name the venues planners distrust.', { ui: true }),
+  ],
+};

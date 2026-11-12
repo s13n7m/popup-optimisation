@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { GUIDE } from '../config';
 import { dataSources, venueColumns } from '../content';
 
 function CopyCode({ text, lang }: { text: string; lang: string }) {
@@ -27,13 +28,10 @@ function CopyCode({ text, lang }: { text: string; lang: string }) {
 export function DataSources() {
   return (
     <div className="view">
-      <h2 className="view-title">Data sources for stage 2</h2>
-      <p className="lede">
-        The plan is an open base list enriched with area statistics, with paid or restricted APIs used only on a shortlist.
-        Test-drive outcomes stay simulated, because no API provides them. This page was written from memory, so open each docs link to confirm endpoints, field names, limits and licence terms before you build on it.
-      </p>
+      <h2 className="view-title">{GUIDE.reference.title}</h2>
+      <p className="lede">{GUIDE.reference.intro}</p>
 
-      <h3>Where each column comes from</h3>
+      <h3>{GUIDE.reference.tableHeading}</h3>
       <div className="scroll-x">
         <table>
           <thead><tr><th>Column</th><th>Source</th><th>Note</th></tr></thead>
@@ -45,7 +43,7 @@ export function DataSources() {
         </table>
       </div>
 
-      <h3>How to use each source</h3>
+      <h3>{GUIDE.reference.listHeading}</h3>
       {dataSources.map((s, i) => (
         <details key={s.id} className="source" open={i === 0}>
           <summary>

@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Session } from '@supabase/supabase-js';
+import { GUIDE } from '../config';
 import { supabase } from './supabase';
 
-const KEY = 'popup-guide-progress-v1';
+const KEY = `${GUIDE.storageKey}-progress-v1`;
 export type SyncState = 'off' | 'idle' | 'saving' | 'error';
 
 function loadLocal(): Record<string, boolean> {

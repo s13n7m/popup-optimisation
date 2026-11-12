@@ -1,16 +1,18 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { allCards, stages } from './content';
 import { Board, type Filters } from './components/Board';
-import { Sheet } from './components/Sheet';
+import { Timer } from './components/Timer';
 import { DataSources } from './components/DataSources';
 import { BuildOrder } from './components/BuildOrder';
 import { AuthBar } from './components/AuthBar';
 import { useProgress } from './lib/useProgress';
-import { CADENCE, type Card, type Stage } from './types';
+import { useTimer } from './lib/useTimer';
+import { GUIDE } from './config';
+import { CADENCE } from './types';
 
 const VIEWS = [
   { id: 'board', label: 'Stages' },
-  { id: 'data-sources', label: 'Data sources' },
+  { id: 'data-sources', label: GUIDE.reference.tabLabel },
   { id: 'build-order', label: 'Build order' },
 ] as const;
 
@@ -21,8 +23,16 @@ function fromHash(): string {
 
 export function App() {
   const { done, toggle, session, sync } = useProgress();
+  const timer = useTimer(session);
   const [view, setView] = useState(fromHash);
-  const [open, setOpen] = useState<{ card: Card; stage: Stage } | null>(null);
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>(() => {
+    try {
+      return JSON.parse(localStorage.getItem(`${GUIDE.storageKey}-collapsed-v1`) || '{}');
+    } catch {
+      return {};
+    }
+  });
   const [filters, setFilters] = useState<Filters>({ cadence: [], uiOnly: false, extrasOnly: false, hideDone: false });
 
   useEffect(() => {
@@ -37,9 +47,22 @@ export function App() {
     window.scrollTo({ top: 0 });
   }, []);
 
+  useEffect(() => {
+    document.title = GUIDE.title;
+  }, []);
+
   const total = allCards.length;
   const count = useMemo(() => allCards.filter((c) => done[c.id]).length, [done]);
-  const closeSheet = useCallback(() => setOpen(null), []);
+  const toggleExpand = useCallback((id: string) => setExpanded((e) => ({ ...e, [id]: !e[id] })), []);
+  const setStages = useCallback((next: Record<string, boolean>) => {
+    setCollapsed(next);
+    try {
+      localStorage.setItem(`${GUIDE.storageKey}-collapsed-v1`, JSON.stringify(next));
+    } catch {
+      /* storage may be unavailable */
+    }
+  }, []);
+  const toggleStage = useCallback((id: string) => setStages({ ...collapsed, [id]: !collapsed[id] }), [collapsed, setStages]);
 
   const toggleCadence = (k: string) =>
     setFilters((f) => ({ ...f, cadence: f.cadence.includes(k) ? f.cadence.filter((x) => x !== k) : [...f.cadence, k] }));
@@ -48,8 +71,11 @@ export function App() {
     <div className="page">
       <header className="top">
         <div>
-          <h1>Pop-up build guide</h1>
-          <p className="muted">Your step-by-step guide to building the predict-then-decide planner, one branch per stage.</p>
+          <div className="title-row">
+            <h1>{GUIDE.title}</h1>
+            <Timer timer={timer} signedIn={!!session} />
+          </div>
+          <p className="muted">{GUIDE.subtitle}</p>
         </div>
         <div className="top-right">
           <div className="overall" role="progressbar" aria-valuemin={0} aria-valuemax={total} aria-valuenow={count} aria-label="Overall progress">
@@ -77,19 +103,19 @@ export function App() {
                 <span className="dot" style={{ background: CADENCE[k].color }}>{k}</span> {CADENCE[k].label}
               </button>
             ))}
-            <button className="chip-btn" aria-pressed={filters.uiOnly} onClick={() => setFilters((f) => ({ ...f, uiOnly: !f.uiOnly }))}>Planner UI only</button>
+            <button className="chip-btn" aria-pressed={filters.uiOnly} onClick={() => setFilters((f) => ({ ...f, uiOnly: !f.uiOnly }))}>{GUIDE.threadLabel} only</button>
             <button className="chip-btn" aria-pressed={filters.extrasOnly} onClick={() => setFilters((f) => ({ ...f, extrasOnly: !f.extrasOnly }))}>Extras only</button>
             <button className="chip-btn" aria-pressed={filters.hideDone} onClick={() => setFilters((f) => ({ ...f, hideDone: !f.hideDone }))}>Hide done</button>
+            <span className="spacer" />
+            <button className="btn small" onClick={() => setStages({})}>Expand all stages</button>
+            <button className="btn small" onClick={() => setStages(Object.fromEntries(stages.map((s) => [s.id, true])))}>Collapse all stages</button>
           </div>
-          <Board stages={stages} done={done} filters={filters} onToggle={toggle} onNavigate={navigate} onOpen={(card, stage) => setOpen({ card, stage })} />
+          <Board stages={stages} done={done} expanded={expanded} collapsed={collapsed} filters={filters} onToggle={toggle} onExpand={toggleExpand} onToggleStage={toggleStage} onNavigate={navigate} />
         </>
       )}
       {view === 'data-sources' && <DataSources />}
       {view === 'build-order' && <BuildOrder done={done} />}
 
-      {open && (
-        <Sheet card={open.card} stage={open.stage} done={!!done[open.card.id]} onToggle={() => toggle(open.card.id)} onClose={closeSheet} onNavigate={navigate} />
-      )}
     </div>
   );
 }
